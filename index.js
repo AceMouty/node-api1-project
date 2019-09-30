@@ -56,6 +56,33 @@ server.delete("/api/users/:id", (req, res) => {
     })
 })
 
+// PUT: update and existing user
+
+server.put('/api/users/:id', (req, res) => {
+
+    // Check we have all needed data
+    if(!req.body.name || !req.body.bio){
+        res.status(400).json({message: "Please provide name and bio for the user"})
+    }
+
+    // Update the user
+    users.update(req.params.id, req.body)
+    .then(() => {
+        users.findById(req.params.id)
+        .then(user => {
+            if(user){
+                console.log(user)
+                res.status(200).json({updatedUser: user})
+            } else if (!user){
+                console.log(user)
+                res.status(404).json({message: "The user with the specified ID does not exist"})
+            }
+        })
+        .catch(err => res.status(500).json({error: "The information could not be modified", err: err}))
+        // res.status(200).json({updatedUser: updatedUser})
+    })
+})
+
 
 const port = 8000;
 server.listen(port, () => console.log(` API IT LISTENING ON PORT ${port}`))
